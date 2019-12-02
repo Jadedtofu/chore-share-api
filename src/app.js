@@ -26,7 +26,7 @@ app.get('/api/*', (req, res) => {
     res.json({ok: 'ok'});
 });
 
-app.use(function errorHandler(error, req, res, next) {
+app.use((error, req, res, next) => {
     let response;
     // if (process.env.NODE_ENV === 'production') {
     if (NODE_ENV === 'production') {
