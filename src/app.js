@@ -4,7 +4,8 @@ const morgan = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
 const { NODE_ENV } = require('./config');
-// import routers here
+const roomiesRouter = require('./roomies/roomies-router');
+// const choresRouter = require('./chores/chores-router');
 
 const app = express();
 
@@ -23,12 +24,13 @@ app.use(
 );
 app.use(helmet());
 
-// use /api routes here
-
+app.use('/api/roomies', roomiesRouter);
+// app.use('/api/chores', choresRouter);
 
 app.get('/api/*', (req, res) => {
     res.json({ok: 'ok'});
 });
+
 
 app.use((error, req, res, next) => {
     let response;
