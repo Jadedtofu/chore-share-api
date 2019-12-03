@@ -49,6 +49,60 @@ choresRouter
     });
 
 choresRouter
+    .route('/:chore_id')
+    .all((req, res, next) => {
+        ChoresService.getById(
+            req.app.get('db'),
+            req.params.chore_id
+        )
+        .then(chore => {
+            if(!chore) {
+                return res.status(404).json({
+                    error: { message: `Chore doesn't exist`}
+                });
+            }
+            res.chore = chore;
+            next();
+        })
+        .catch(next);
+    })
+    .get((req, res, next) => {
+        res.json(serializedChore(res.chore));
+    })
+    .delete((req, res, next) => {
+        ChoresService.deleteChore(
+            req.app.get('db'),
+            req.params.chore_id
+        )
+        .then(() => {
+            logger.info(`Chore with id ${req.params.chore_id} deleted`)
+            res.status(204).end();
+        })
+        .catch();
+    })
+    .patch(jsonParser, (req, res, next) => {
+        const { chore, roomie_id } = req.body;
+        const choreToUpdate = { chore, roomie_id };
 
+        const numberOfValues = Object.values(choreToUpdate).filter(Boolean).length;
+        if(numberOfValues == 0) {
+            return res.status(400).json({
+                error: {
+                    message: `Request body must have 'chore' and 'roomie_id`
+                }
+            });
+        }
+
+        ChoresService.updateChore(
+            req.app.get('db'),
+            req.params.chore_id,
+            choreToUpdate
+        )
+        .then(() => {
+            logger.info(`Chore with id ${req.params.chore_id} updated`)
+            res.status(204).end();
+        })
+        .catch(next);
+    });
 
 module.exports = choresRouter;
