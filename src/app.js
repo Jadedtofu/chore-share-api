@@ -14,20 +14,21 @@ const morganOption = (NODE_ENV === 'production')
     ? 'tiny'
     : 'common';
 
-const { CLIENT_ORIGIN } = require('./config');
+// const { CLIENT_ORIGIN } = require('./config');
 
 app.use(morgan(morganOption));
-app.use(
-    cors({
-        origin: CLIENT_ORIGIN
-    })
-);
+// app.use(
+//     cors({
+//         origin: CLIENT_ORIGIN
+//     })
+// );
+app.use(cors());
 app.use(helmet());
 
 app.use('/api/roomies', roomiesRouter);
 // app.use('/api/chores', choresRouter);
 
-app.get('/api/*', (req, res) => {
+app.get('/api/', (req, res) => {
     res.json({ok: 'ok'});
 });
 
