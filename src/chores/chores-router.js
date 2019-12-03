@@ -23,6 +23,32 @@ choresRouter
             res.json(chores.map(serializedChore));
         })
         .catch(next);
+    })
+    .post(jsonParser, (req, res, next) => {
+        const { chore, roomie_id } = req.body;
+        const newChore = { chore, roomie_id };
+        
+        for(const [key, value] of Object.entries(newChore)) {
+            if (value == null) {
+                return res.status(400).json({
+                    error: { message: `Missing '${key}' in request body`}
+                });
+            }
+        }
+        ChoresService.insertChore(
+            req.app.get('db'),
+            newChore
+        )
+        .then(chore => {
+            logger.info(`Chore with id ${chore.id} created`)
+            res.status(201)
+                .location(path.posix.join(req.originalUrl, `/${chore.id}`))
+                .json(serializedChore(chore));
+        })
+        .catch(next);
     });
+
+choresRouter
+
 
 module.exports = choresRouter;
