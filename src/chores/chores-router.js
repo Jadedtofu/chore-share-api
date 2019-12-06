@@ -25,8 +25,8 @@ choresRouter
         .catch(next);
     })
     .post(jsonParser, (req, res, next) => {
-        const { chore, roomie_id } = req.body;
-        const newChore = { chore, roomie_id };
+        const { chore, checked = false, roomie_id } = req.body;
+        const newChore = { chore, checked, roomie_id };
         
         for(const [key, value] of Object.entries(newChore)) {
             if (value == null) {
@@ -35,6 +35,8 @@ choresRouter
                 });
             }
         }
+        newChore.checked = checked;
+
         ChoresService.insertChore(
             req.app.get('db'),
             newChore
@@ -51,6 +53,12 @@ choresRouter
 choresRouter
     .route('/:chore_id')
     .all((req, res, next) => {
+        if(isNan(parseInt(req.params.chore_id))) {
+            return res.status(404).json({
+                eror: { message: `Id must be a number` }
+            });
+        }
+
         ChoresService.getById(
             req.app.get('db'),
             req.params.chore_id
@@ -81,14 +89,14 @@ choresRouter
         .catch();
     })
     .patch(jsonParser, (req, res, next) => {
-        const { chore, roomie_id } = req.body;
-        const choreToUpdate = { chore, roomie_id };
-
+        const { chore, checked, roomie_id } = req.body;
+        const choreToUpdate = { chore, checked, roomie_id };
+        
         const numberOfValues = Object.values(choreToUpdate).filter(Boolean).length;
         if(numberOfValues == 0) {
             return res.status(400).json({
                 error: {
-                    message: `Request body must have 'chore' and 'roomie_id`
+                    message: `Request body must have 'chore', 'checked', and 'roomie_id`
                 }
             });
         }
@@ -99,9 +107,12 @@ choresRouter
             choreToUpdate
         )
         .then(() => {
-            logger.info(`Chore with id ${req.params.chore_id} updated`)
+            logger.info(`Chore with id ${req.params.chore_id} updated`);
             res.status(204).end();
         })
+        // .then(updatedChore => {
+        //     res.status(200).json(serializedChore(updatedChore[0]))
+        // })
         .catch(next);
     });
 

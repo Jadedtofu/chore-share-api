@@ -102,6 +102,9 @@ roomiesRouter
             logger.info(`Roomie with id ${req.params.roomie_id} updated`);
             res.status(204).end();
         })
+        // .then(updatedRoomie => {
+        //     res.status(200).json(serializedRoomie(updatedRoomie[0]))
+        // })
         .catch(next);
     });
 
