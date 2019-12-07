@@ -88,7 +88,7 @@ roomiesRouter
         if(numberOfValues === 0) {
             return res.status(400).json({
                 error: {
-                    message: `Request body must contain 'name' and 'note'`
+                    message: `Request body must contain 'name', or 'note'`
                 }
             });
         }
@@ -102,9 +102,6 @@ roomiesRouter
             logger.info(`Roomie with id ${req.params.roomie_id} updated`);
             res.status(204).end();
         })
-        // .then(updatedRoomie => {
-        //     res.status(200).json(serializedRoomie(updatedRoomie[0]))
-        // })
         .catch(next);
     });
 

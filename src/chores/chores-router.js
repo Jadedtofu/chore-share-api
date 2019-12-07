@@ -10,6 +10,7 @@ const jsonParser = express.json();
 const serializedChore = chore => ({
     id: chore.id,
     chore: xss(chore.chore),
+    checked: chore.checked,
     roomie_id: chore.roomie_id
 });
 
@@ -53,12 +54,6 @@ choresRouter
 choresRouter
     .route('/:chore_id')
     .all((req, res, next) => {
-        if(isNan(parseInt(req.params.chore_id))) {
-            return res.status(404).json({
-                eror: { message: `Id must be a number` }
-            });
-        }
-
         ChoresService.getById(
             req.app.get('db'),
             req.params.chore_id
@@ -96,7 +91,7 @@ choresRouter
         if(numberOfValues == 0) {
             return res.status(400).json({
                 error: {
-                    message: `Request body must have 'chore', 'checked', and 'roomie_id`
+                    message: `Request body must have 'chore', checked, or 'roomie_id'`
                 }
             });
         }
@@ -110,9 +105,6 @@ choresRouter
             logger.info(`Chore with id ${req.params.chore_id} updated`);
             res.status(204).end();
         })
-        // .then(updatedChore => {
-        //     res.status(200).json(serializedChore(updatedChore[0]))
-        // })
         .catch(next);
     });
 
