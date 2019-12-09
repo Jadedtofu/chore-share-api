@@ -27,6 +27,31 @@ function makeChoresArray() {
     ];
 }
 
+function makeChoresNoId() {
+    return[
+        {
+            chore: 'Shine the chrome on sinks',
+            checked: false,
+            roomie_id: 1
+        },
+        {
+            chore: 'Clean the bathtub',
+            checked: false,
+            roomie_id: 1
+        },
+        {
+            chore: 'Hang the laundry',
+            checked: false,
+            roomie_id: 2
+        },
+        {
+            chore: 'Sweep the floor',
+            checked: false,
+            roomie_id: 2
+        }
+    ];
+}
+
 function makeBadChore() {
     const badChore = {
         id: 119,
@@ -50,5 +75,6 @@ function makeBadChore() {
 
 module.exports = {
     makeChoresArray,
+    makeChoresNoId,
     makeBadChore
 }

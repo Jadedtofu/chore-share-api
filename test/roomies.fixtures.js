@@ -14,6 +14,19 @@ function makeRoomiesArray() {
     ];
 }
 
+function makeRoomiesNoId() {
+    return[
+        {
+            name: 'Alice Winchester',
+            note: 'Rooming for 1 year, studying biology.'
+        },
+        {
+            name: 'Heather Lamis',
+            note: 'Rooming for 1 year, studying chemistry.'
+        }
+    ];
+}
+
 function makeBadRoomie() {
   const badRoomie = {
       id: 911,
@@ -35,5 +48,6 @@ function makeBadRoomie() {
 
 module.exports = {
     makeRoomiesArray,
+    makeRoomiesNoId,
     makeBadRoomie
 }

@@ -32,6 +32,10 @@ app.get('/api/', (req, res) => {
     res.json({ok: 'ok'});
 });
 
+app.get('/', (req, res) => {
+    res.send('Hello, world');
+});
+
 app.use((error, req, res, next) => {
     let response;
     // if (process.env.NODE_ENV === 'production') {

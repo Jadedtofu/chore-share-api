@@ -2,7 +2,7 @@ const { expect } = require('chai');
 const supertest = require('supertest');
 const knex = require('knex');
 const app = require('../src/app');
-const { makeRoomiesArray } = require('./roomies.fixtures');
+const { makeRoomiesArray, makeRoomiesNoId } = require('./roomies.fixtures');
 
 describe('Roomies Endpoints', () => {
     let db;
@@ -38,15 +38,6 @@ describe('Roomies Endpoints', () => {
                 return db
                     .into('choreshare_roomies')
                     .insert(testRoomies)
-                    .then(() => {
-                        return db
-                            .into('choreshare_roomies')
-                            .insert(testRoomies.map(testRoomie => ({
-                                id: testRoomie.id,
-                                name: testRoomie.name,
-                                note: testRoomie.note
-                            })));
-                    });
             });
 
             it(`responds with 200 and all the roomies`, () => {
@@ -78,15 +69,6 @@ describe('Roomies Endpoints', () => {
                 return db
                     .into('choreshare_roomies')
                     .insert(testRoomies)
-                    .then(() => {
-                        return db
-                            .into('choreshare_roomies')
-                            .insert(testRoomies.map(testRoomie => ({
-                                id: testRoomie.id,
-                                name: testRoomie.name,
-                                note: testRoomie.note
-                            })));
-                    });
             });
 
             it(`responds with 200 and the specified roomie`, () => {
@@ -100,7 +82,7 @@ describe('Roomies Endpoints', () => {
     });
 
     describe(`POST /api/roomies`, () => {
-        const testRoomies = makeRoomiesArray();
+        const testRoomies = makeRoomiesNoId();
         beforeEach(`insert roomies`, () => {
             return db
                 .into(`choreshare_roomies`)
@@ -108,10 +90,9 @@ describe('Roomies Endpoints', () => {
         });
 
         it(`creates a roomie, responds with 201 and the new roomie`, () => {
-            this.retries(3)
             const newRoomie = {
-                name: 'Joseph Petra',
-                note: 'Rooming for 2 years, attending night classes'
+                name: 'Nathan Darius',
+                note: 'Rooming for 1 year, goes to the gym a lot'
             }
 
             return supertest(app)
@@ -151,20 +132,11 @@ describe('Roomies Endpoints', () => {
                 return db
                     .into(`choreshare_roomies`)
                     .insert(testRoomies)
-                    .then(() => {
-                        return db
-                            .into('choreshare_roomies')
-                            .insert(testRoomies.map(testRoomie => ({
-                                id: testRoomie.id,
-                                name: testRoomie.name,
-                                note: testRoomie.note
-                            })));
-                    });
             });
 
             it(`responds with 204 and removes the roomie`, () => {
                 const idToRemove = 2;
-                expectedRoomies = testRoomies.filter(roomie => roomie.id !== idToRemove);
+                const expectedRoomies = testRoomies.filter(roomie => roomie.id !== idToRemove);
                 return supertest(app)
                     .delete(`/api/roomies/${idToRemove}`)
                     .expect(204)
@@ -184,7 +156,7 @@ describe('Roomies Endpoints', () => {
                 return supertest(app)
                     .patch(`/api/roomies/${roomieId}`)
                     .expect(404, { error:
-                                    { message: `Roomie doesnt' exist`}});
+                                    { message: `Roomie doesn't exist`}});
             });
         });
 
@@ -195,15 +167,6 @@ describe('Roomies Endpoints', () => {
                 return db
                     .into('choreshare_roomies')
                     .insert(testRoomies)
-                    .then(() => {
-                        return db
-                            .into('choreshare_roomies')
-                            .insert(testRoomies.map(testRoomie => ({
-                                id: testRoomie.id,
-                                name: testRoomie.name,
-                                note: testRoomie.note
-                            })));
-                    });
             });
 
             it(`responds with 204 and updates the roomie`, () => {

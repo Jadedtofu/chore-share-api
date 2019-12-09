@@ -2,7 +2,8 @@ const { expect } = require('chai');
 const supertest = require('supertest');
 const knex = require('knex');
 const app = require('../src/app');
-const { makeChoresArray } = require('./chores.fixtures');
+const { makeChoresArray, makeChoresNoId } = require('./chores.fixtures');
+const { makeRoomiesArray } = require('./roomies.fixtures');
 
 describe('Chores Endpoints', () => {
     let db;
@@ -32,28 +33,24 @@ describe('Chores Endpoints', () => {
         });
 
         context(`Given there are chores in the database`, () => {
+            const testRoomies = makeRoomiesArray();
             const testChores = makeChoresArray();
     
             beforeEach(`insert chores`, () => {
                 return db
-                    .into(`choreshare_chores`)
-                    .insert(testChores)
+                    .into(`choreshare_roomies`)
+                    .insert(testRoomies)
                     .then(() => {
                         return db
                             .into(`choreshare_chores`)
-                            .insert(testChores.map(testChore => ({
-                                id: testChore.id,
-                                chore: testChore.chore,
-                                checked: testChore.checked,
-                                roomie_id: testChore.roomie_id
-                            })));
+                            .insert(testChores)
                     });
             });
 
             it(`responds with 200 and all the chores`, () => {
                 return supertest(app)
                     .get(`/api/chores`)
-                    .expect(200, testChores)
+                    .expect(200, testChores);
             });
         });
     });
@@ -73,21 +70,17 @@ describe('Chores Endpoints', () => {
         });
 
         context(`Given there are chores in the database`, () => {
+            const testRoomies = makeRoomiesArray();
             const testChores = makeChoresArray();
 
             beforeEach('insert chores', () => {
                 return db
-                    .into('choreshare_chores')
-                    .insert(testChores)
+                    .into('choreshare_roomies')
+                    .insert(testRoomies)
                     .then(() => {
                         return db
-                            .into('choreshare_chores')
-                            .insert(testChores.map(testChore => ({
-                                id: testChore.id,
-                                chore: testChore.chore,
-                                checked: testChore.checked,
-                                roomie_id: testChore.roomie_id
-                            })));
+                            .into(`choreshare_chores`)
+                            .insert(testChores);
                     });
             });
 
@@ -102,15 +95,21 @@ describe('Chores Endpoints', () => {
     });
 
     describe(`POST /api/chores`, () => {
-        const testChores = makeChoresArray();
+        const testRoomies = makeRoomiesArray();
+        const testChores = makeChoresNoId();
+
         beforeEach(`insert chores`, () => {
             return db
-                .into(`choreshare_chores`)
-                .insert(testChores);
+                .into(`choreshare_roomies`)
+                .insert(testRoomies)
+                .then(() => {
+                    return db
+                        .into(`choreshare_chores`)
+                        .insert(testChores);
+                });
         });
 
         it(`creates a chore, responds with 201 and the new chore`, () => {
-            this.retries(3)
             const newChore = {
                 chore: 'Dust the bookshelf',
                 checked: false,
@@ -136,6 +135,121 @@ describe('Chores Endpoints', () => {
         });
     });
 
-    
+    describe(`DELETE /api/chores/:chore_id`, () => {
+        context(`Given no chores`, () => {
+            it(`responds with 404`, () => {
+                const choreId = 123456;
+                return supertest(app)
+                    .delete(`/api/chores/${choreId}`)
+                    .expect(404, {
+                        error: { message: `Chore doesn't exist` }
+                    });
+            });
+        });
 
+        context(`Given there are chores in the database`, () => {
+            const testRoomies = makeRoomiesArray();
+            const testChores = makeChoresArray();
+
+            beforeEach(`insert chores`, () => {
+                return db
+                    .into(`choreshare_roomies`)
+                    .insert(testRoomies)
+                    .then(() => {
+                        return db
+                            .into(`choreshare_chores`)
+                            .insert(testChores);
+                    });
+            });
+
+            it(`responds with 204 and removes the chore`, () => {
+                const idToRemove = 2;
+                const expectedChores = testChores.filter(chore => chore.id !== idToRemove);
+                return supertest(app)
+                    .delete(`/api/chores/${idToRemove}`)
+                    .expect(204)
+                    .then(() => 
+                        supertest(app)
+                            .get(`/api/chores`)
+                            .expect(expectedChores)
+                    );
+            });
+        })
+    })
+
+    describe(`PATCH /api/chores/:chore_id`, () => {
+        context(`Given no chores`, () => {
+            it(`responds with 404`, () => {
+                const choreId = 123456;
+                return supertest(app)
+                    .patch(`/api/chores/${choreId}`)
+                    .expect(404, { error: { message: `Chore doesn't exist`}});
+            });
+        });
+
+        context(`Given there are chores in the database`, () => {
+            const testRoomies = makeRoomiesArray();
+            const testChores = makeChoresArray();
+
+            beforeEach(`insert chores`, () => {
+                return db
+                    .into(`choreshare_roomies`)
+                    .insert(testRoomies)
+                    .then(() => {
+                        return db
+                            .into(`choreshare_chores`)
+                            .insert(testChores);
+                    });
+            });
+
+            it(`responds with 204 and updates the chore`, () => {
+                const idToUpdate = 2;
+                const updatedChore = {
+                    chore: 'Clean the oven',
+                    checked: false,
+                    roomie_id: 2
+                }
+    
+                const expectedChore = {
+                    ...testChores[idToUpdate - 1],
+                    ...updatedChore
+                }
+    
+                return supertest(app)
+                    .patch(`/api/chores/${idToUpdate}`)
+                    .send(updatedChore)
+                    .expect(204)
+                    .then(() =>
+                        supertest(app)
+                            .get(`/api/chores/${idToUpdate}`)
+                            .expect(expectedChore)
+                    );
+            });
+
+            it(`responds with 204 when updating a subset of fields`, () => {
+                const idToUpdate = 3;
+                const updatedChore = {
+                    chore: 'Vacuum the master bedroom'
+                }
+    
+                const expectedChore = {
+                    ...testChores[idToUpdate - 1],
+                    ...updatedChore
+                }
+    
+                return supertest(app)
+                    .patch(`/api/chores/${idToUpdate}`)
+                    .send({
+                        ...updatedChore,
+                        fieldToIgnore: `should not be in GET response`
+                    })
+                    .expect(204)
+                    .then(() => 
+                        supertest(app)
+                            .get(`/api/chores/${idToUpdate}`)
+                            .expect(expectedChore)
+                    );
+            });
+        });
+    });
 });
