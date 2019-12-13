@@ -9,19 +9,11 @@ const choresRouter = require('./chores/chores-router');
 
 const app = express();
 
-// const morganOption = (process.env.NODE_ENV === 'production')
 const morganOption = (NODE_ENV === 'production')
     ? 'tiny'
     : 'common';
 
-// const { CLIENT_ORIGIN } = require('./config');
-
 app.use(morgan(morganOption));
-// app.use(
-//     cors({
-//         origin: CLIENT_ORIGIN
-//     })
-// );
 app.use(cors());
 app.use(helmet());
 
@@ -38,7 +30,6 @@ app.get('/', (req, res) => {
 
 app.use((error, req, res, next) => {
     let response;
-    // if (process.env.NODE_ENV === 'production') {
     if (NODE_ENV === 'production') {
         response = { error: { message: 'server error'}}
     } else {
