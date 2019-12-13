@@ -22,7 +22,7 @@ A Node, Express, PostgreSQL back-end for the Chore Share app. This Chore Share d
 The API relies on a PSQL database. This will need to be configured for data to be seeded or reset.
 
 # Using the API
-THe API has endpoints for handling CRUD operations for the roomies and chores. Start the server and use [Postman](https://www.getpostman.com/) or a similar tool to test out the endpoints.
+The API has endpoints for handling CRUD operations for the roomies and chores. Start the server and use [Postman](https://www.getpostman.com/) or a similar tool to test out the endpoints.
 
 ## Roomies Endpoints
 **GET** `/roomies` <br>
