@@ -35,7 +35,7 @@ Returns an array of all Roomies in the database. Example response body:
             "note": "Rooming for 4 years, majoring in Biology."
         },
         {
-            id: 2,
+            "id": 2,
             "name": "Heather Lamis",
             "note": "Rooming for 1 year, bartender at night."
         }
