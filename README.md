@@ -130,3 +130,57 @@ Posts to the Chores Endpoint and adds a chore to the database corresponding to t
 
 **DELETE** `/chores/:chore_id` <br>
 Deletes the Chore corresponding to the ID from the request. This will not provide a response, but will remove the Chore from the database.
+
+----
+
+## Database
+This API relies on a PSQL database, which you will need to create and configure to be able to test the data. 
+
+### Creation
+Use PSQL to create the local databases, 'choreshare' and 'choreshare-test'. Both should have a superuser 'choreshare_user'
+
+```
+$ createdb -U choreshare_user choreshare
+$ createdb -U choreshare_user choreshare-test
+```
+If you choose to use different names or settings, please be sure to update the 'config.js' and '.env' files to match.
+
+### Migration
+Please use a Postgrator to migrate and add the schema:
+```
+$ npm run migrate
+```
+and
+```
+$ npm run migrate --0
+```
+if you ever need to reset the table data
+
+### Seed
+You may see the data by importing the seeds through the directory path leading to the seed file like:
+```
+\i 'C:/Users/userName/projectFolder/chore-share-api/seeds/seed.choreshare_roomies.sql';
+
+\i 'C:/Users/userName/projectFolder/chore-share-api/seeds/seed.choreshare_chores.sql';
+```
+or
+```
+$ psql -U choreshare_user -d choreshare -f ./seeds/seed.choreshare_roomies.sql
+$ psql -U choreshare_user -d choreshare -f ./seeds.seed.choreshare_chores.sql
+```
+
+## Running the API
+To start the server, you may run the following:
+```
+npm start
+```
+or
+```
+npm run dev
+```
+to start the Nodemon server
+
+Run the tests:
+```
+npm test
+```
