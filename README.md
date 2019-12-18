@@ -143,7 +143,7 @@ Use PSQL to create the local databases, 'choreshare' and 'choreshare-test'. Both
 $ createdb -U choreshare_user choreshare
 $ createdb -U choreshare_user choreshare-test
 ```
-If you choose to use different names or settings, please be sure to update the 'config.js' and '.env' files to match.
+If you choose to use different names or settings, please be sure to update the 'config.js' and '.env' files to match. You'll need to rename the 'example.env' file in order for the current configurations to work.
 
 ### Migration
 Please use a Postgrator to migrate and add the schema:
